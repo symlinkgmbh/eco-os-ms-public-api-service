@@ -1,0 +1,1391 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "The public api service is the service that consumes all incoming requests.",
+    "version": "1.0.0",
+    "title": "2ndLock public api service",
+    "termsOfService": "http://2ndLock.com",
+    "contact": {
+      "email": "jens@symlink.de"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "basePath": "/api/v1/",
+  "tags": [
+    {
+      "name": "accounts"
+    },
+    {
+      "name": "activation"
+    },
+    {
+      "name": "authentication"
+    },
+    {
+      "name": "config"
+    },
+    {
+      "name": "content"
+    },
+    {
+      "name": "protection"
+    },
+    {
+      "name": "key"
+    },
+    {
+      "name": "localization"
+    },
+    {
+      "name": "mimetypes"
+    },
+    {
+      "name": "password"
+    },
+    {
+      "name": "queue"
+    },
+    {
+      "name": "register"
+    },
+    {
+      "name": "services"
+    },
+    {
+      "name": "validation"
+    }
+  ],
+  "schemes": ["http", "https"],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "tags": ["accounts"],
+        "summary": "get account by id",
+        "description": "returns a single account",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id from requesting account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "put": {
+        "tags": ["accounts"],
+        "summary": "update account by id",
+        "description": "updates a single account",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id from requesting account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["accounts"],
+        "summary": "delete account by id",
+        "description": "deletes a single account",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id from requesting account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/account/email/{mail}": {
+      "get": {
+        "tags": ["accounts"],
+        "summary": "get account by email address",
+        "description": "load account by email address",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "mail",
+            "in": "path",
+            "description": "id from requesting account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/account": {
+      "post": {
+        "tags": ["accounts"],
+        "summary": "create new account",
+        "description": "Create new account by post email address",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateAccount"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Missing params or email address already registered"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/accounts": {
+      "get": {
+        "tags": ["accounts"],
+        "summary": "load all accounts",
+        "description": "Returns an array of json objects with accounts",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/accounts/search/{query}": {
+      "get": {
+        "tags": ["accounts"],
+        "summary": "search for email address",
+        "description": "Returns an array of json objects with accounts",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "path",
+            "description": "email address to search for",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/accounts/import": {
+      "post": {
+        "tags": ["accounts"],
+        "summary": "import account by csv file",
+        "description": "Import a bunch of user by csv file",
+        "produces": ["application/json"],
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ImportAccounts"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/activation/activate": {
+      "post": {
+        "tags": ["activation"],
+        "summary": "activate account",
+        "description": "activate account and set password",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ActivateAccount"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/deactivation/deactivate/{id}": {
+      "get": {
+        "tags": ["activation"],
+        "summary": "deactivate account",
+        "description": "deactivate account by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id from account",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/authenticate": {
+      "post": {
+        "tags": ["authentication"],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Authentication"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/config": {
+      "post": {
+        "tags": ["config"],
+        "summary": "add config",
+        "description": "create new config entry",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Config"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "put": {
+        "tags": ["config"],
+        "summary": "update config",
+        "description": "update config entry",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Config"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "get": {
+        "tags": ["config"],
+        "summary": "load all config entries",
+        "description": "get all config entries as an array of json objects",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["config"],
+        "summary": "delete all config entries",
+        "description": "remove all config entries from the database",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/config/{name}": {
+      "get": {
+        "tags": ["config"],
+        "summary": "get config entry by name",
+        "description": "get config entry by name",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "name of the config entry",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["config"],
+        "summary": "delete config entry by name",
+        "description": "delete config entry by name",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "name of the config entry",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/config/load/client": {
+      "get": {
+        "tags": ["config"],
+        "summary": "get config for frontend",
+        "description": "returns if captcha is active",
+        "produces": ["applicatin/json"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/content/{checksum}": {
+      "get": {
+        "tags": ["content"],
+        "summary": "load content object by checksum",
+        "description": "load content object by checksum",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "checksum",
+            "in": "path",
+            "description": "name of the config entry",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/content": {
+      "delete": {
+        "tags": ["content"],
+        "summary": "delete outdated content",
+        "description": "delete all config entries with outdated date value",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/protection": {
+      "get": {
+        "tags": ["protection"],
+        "summary": "get all ip table entries",
+        "description": "get all current stored ip addresses",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "post": {
+        "tags": ["protection"],
+        "summary": "add ip address to ip table",
+        "description": "add ip address to blacklist (deny true) or whitelist (deny false)",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IpAddress"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/protection/blacklist": {
+      "get": {
+        "tags": ["protection"],
+        "summary": "get all ip table entries from blacklist",
+        "description": "returns an array of json objects",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["protection"],
+        "summary": "delete all ip table entries from blacklist",
+        "description": "removes whole ip blacklist",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/protection/whitelist": {
+      "get": {
+        "tags": ["protection"],
+        "summary": "get all ip table entries from whitelist",
+        "description": "returns an array of json objects",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["protection"],
+        "summary": "delete all ip table entries from whitelist",
+        "description": "removes whole ip whitelist",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/protection/address/{id}": {
+      "get": {
+        "tags": ["protection"],
+        "summary": "get ip address by id",
+        "description": "returns an ip address object",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the ip address",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "put": {
+        "tags": ["protection"],
+        "summary": "update ip address by id",
+        "description": "updates an ip address object",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the ip address",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IpAddress"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["protection"],
+        "summary": "delete ip address by id",
+        "description": "delete an ip address object",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the ip address",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/protection/search/{ip}": {
+      "get": {
+        "tags": ["protection"],
+        "summary": "search for ip address",
+        "description": "returns an ip address object",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "path",
+            "description": "ip address to search for",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/key": {
+      "post": {
+        "tags": ["key"],
+        "summary": "add new key",
+        "description": "create key entry",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Key"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/key/{email}": {
+      "get": {
+        "tags": ["key"],
+        "summary": "load keys by email",
+        "description": "return an array of json objects",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "email to load keys",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/revoke/key/{pubkey}": {
+      "delete": {
+        "tags": ["key"],
+        "summary": "delete pubkey by key",
+        "description": "delete pub key",
+        "parameters": [
+          {
+            "name": "pubkey",
+            "in": "path",
+            "description": "public to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/revoke/device/{deviceid}": {
+      "delete": {
+        "tags": ["key"],
+        "summary": "delete pubkey by deviceid",
+        "description": "delete pub key",
+        "parameters": [
+          {
+            "name": "deviceid",
+            "in": "path",
+            "description": "deviceid to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/keys": {
+      "delete": {
+        "tags": ["key"],
+        "summary": "delete all public keys",
+        "description": "delete all public keys from system",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/locale": {
+      "get": {
+        "tags": ["localization"],
+        "summary": "load whole localization",
+        "description": "returns an array of objects",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/locale/{key}": {
+      "get": {
+        "tags": ["localization"],
+        "summary": "load localizatin entry by label key",
+        "description": "returns a local object",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "key",
+            "in": "path",
+            "description": "key of local entry",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/mimetype/{extension}": {
+      "get": {
+        "tags": ["mimetypes"],
+        "summary": "load mimetype extensions",
+        "description": "returns a mimetype object",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "extension",
+            "in": "path",
+            "description": "extension you requesting for",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/password/forgot": {
+      "post": {
+        "tags": ["password"],
+        "summary": "send forgot password request",
+        "description": "send forgot password request",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ForgotPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/password/update": {
+      "post": {
+        "tags": ["password"],
+        "summary": "send new password request",
+        "description": "send new password request",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/queue": {
+      "get": {
+        "tags": ["queue"],
+        "summary": "get all queue entries",
+        "description": "returns an array of json objects",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/queue/{id}": {
+      "get": {
+        "tags": ["queue"],
+        "summary": "get queue entry by id",
+        "description": "returns an json objec",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id for queue entry",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": ["register"],
+        "summary": "send register request",
+        "description": "send register request",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Register"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "tags": ["services"],
+        "summary": "return all services instances",
+        "description": "send an array of json objects",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/validation/activate/{id}": {
+      "get": {
+        "tags": ["validation"],
+        "summary": "validate activation id",
+        "description": "check if activation id is valid",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "activation id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validation/delete/{id}": {
+      "get": {
+        "tags": ["validation"],
+        "summary": "validate delete id",
+        "description": "check if delete id is valid",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "delete id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/validation/forgot/{id}": {
+      "get": {
+        "tags": ["validation"],
+        "summary": "validate forgot id",
+        "description": "check if forgot id is valid",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "forgot id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/heartbeat": {
+      "get": {
+        "tags": ["heartbeat"],
+        "summary": "get current heartbeat from service",
+        "description": "response with current service health",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Authentication": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateAccount": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "ImportAccounts": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        }
+      }
+    },
+    "ActivateAccount": {
+      "type": "object",
+      "properties": {
+        "activationId": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "confirmPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "Config": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "IpAddress": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "deny": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Key": {
+      "type": "object",
+      "properties": {
+        "pubKey": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "ForgotPassword": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "UpdatePassword": {
+      "type": "object",
+      "properties": {
+        "otp": {
+          "type": "string"
+        },
+        "forgotPasswordId": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "confirmPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "Register": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

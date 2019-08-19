@@ -1,0 +1,108 @@
+{
+  "environment": "test",
+  "version": "0.0.1",
+  "buildDate": "NOW",
+  "buildSHA": "4-8-15-16-23-42",
+  "name": "eco-os-public-api-service",
+  "serviceId": "005",
+  "server": {
+    "port": "9000"
+  },
+  "logVerbose": true,
+  "acl": {
+    "description": "acl_eco_ms_public_api_service",
+    "entries": [
+      {
+        "role": "user",
+        "forbiddenAttributes": ["password", "forgotPasswordId", "acl", "domain", "job", "failover"],
+        "allowedActions": [
+          {
+            "method": "POST",
+            "path": "/api/v1/authenticate"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/activation/activate"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/deactivation/activate"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/content"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/content"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/content/*"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/key/*"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/key"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/me"
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/me"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/v1/me"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/password/forgot"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/password/update"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/change/password"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/mimetype/*"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/licensing/check/light"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/account/access/apikey"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/account/access/apikey"
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/account/access/apikey/delete"
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/v1/account/access/apikey/delete/all"
+          }
+        ]
+      },
+      {
+        "role": "admin",
+        "forbiddenAttributes": ["password"],
+        "allowedActions": []
+      }
+    ]
+  }
+}
