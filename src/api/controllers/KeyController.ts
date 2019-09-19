@@ -1,32 +1,51 @@
-/** 
-* Copyright 2018-2019 Symlink GmbH 
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License. 
-* You may obtain a copy of the License at 
-*  
-*     http://www.apache.org/licenses/LICENSE-2.0 
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License. 
-* 
-*/ 
+/**
+ * Copyright 2018-2019 Symlink GmbH
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 
-import { injectKeyClient } from "@symlinkde/eco-os-pk-core";
+
+
+import { injectKeyClient, injectFederationClient } from "@symlinkde/eco-os-pk-core";
 import { ITokenRequest } from "../../infrastructure/protection/ITokenRequest";
 import { ApiResponseBuilder, CustomRestError } from "@symlinkde/eco-os-pk-api";
 import { PkCore, PkApi, MsKey } from "@symlinkde/eco-os-pk-models";
+import { IRegisterValidator, RegisterValidator } from "../../infrastructure/register";
 
+@injectFederationClient
 @injectKeyClient
 export class KeyController {
-  public keyClient!: PkCore.IEcoKeyClient;
+  private keyClient!: PkCore.IEcoKeyClient;
+  private registrationValidator: IRegisterValidator;
+  private federationClient!: PkCore.IEcoFederationClient;
+
+  public constructor() {
+    this.registrationValidator = new RegisterValidator();
+  }
 
   public async getUsersKeyByEmail(req: ITokenRequest): Promise<PkApi.IApiResponse> {
     try {
-      return ApiResponseBuilder.buildApiResponse(await this.keyClient.loadUsersKeyByEmail({ email: req.params.email }));
+      if (!(await this.registrationValidator.isLocaleRegisteredDomain(req.params.email))) {
+        await this.federationClient.initFederation(req.params.email.split("@")[1]);
+        return ApiResponseBuilder.buildApiResponse(
+          await this.federationClient.loadRemoteUserPublicKeys(req.params.email),
+        );
+      } else {
+        return ApiResponseBuilder.buildApiResponse(
+          await this.keyClient.loadUsersKeyByEmail({ email: req.params.email }),
+        );
+      }
     } catch (err) {
       if (!err.response) {
         throw new CustomRestError(err, 500);
