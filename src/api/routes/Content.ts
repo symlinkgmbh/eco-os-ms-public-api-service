@@ -103,7 +103,7 @@ export class ContentRoute extends AbstractRoutes implements PkApi.IRoute {
       .route("/api/v1/content")
       .delete((req: ITokenRequest, res: Response, next: NextFunction) => {
         this.contentController
-          .revokeOutdatedContent(req)
+          .revokeOutdatedContent()
           .then((result) => {
             res.send(result.data);
           })

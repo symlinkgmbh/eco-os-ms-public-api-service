@@ -17,18 +17,18 @@
 
 
 
-import { injectKeyClient, injectFederationClient } from "@symlinkde/eco-os-pk-core";
+import { injectKeyClient, injectFederationKeyClient } from "@symlinkde/eco-os-pk-core";
 import { ITokenRequest } from "../../infrastructure/protection/ITokenRequest";
 import { ApiResponseBuilder, CustomRestError } from "@symlinkde/eco-os-pk-api";
 import { PkCore, PkApi, MsKey } from "@symlinkde/eco-os-pk-models";
 import { IRegisterValidator, RegisterValidator } from "../../infrastructure/register";
 
-@injectFederationClient
+@injectFederationKeyClient
 @injectKeyClient
 export class KeyController {
   private keyClient!: PkCore.IEcoKeyClient;
   private registrationValidator: IRegisterValidator;
-  private federationClient!: PkCore.IEcoFederationClient;
+  private federationKeyClient!: PkCore.IEcoFederationKeyClient;
 
   public constructor() {
     this.registrationValidator = new RegisterValidator();
@@ -36,10 +36,10 @@ export class KeyController {
 
   public async getUsersKeyByEmail(req: ITokenRequest): Promise<PkApi.IApiResponse> {
     try {
-      if (!(await this.registrationValidator.isLocaleRegisteredDomain(req.params.email))) {
-        await this.federationClient.initFederation(req.params.email.split("@")[1]);
+      if (!(await this.registrationValidator.isLocaleRegisteredDomain(req))) {
+        await this.federationKeyClient.initFederation(req.params.email.split("@")[1]);
         return ApiResponseBuilder.buildApiResponse(
-          await this.federationClient.loadRemoteUserPublicKeys(req.params.email),
+          await this.federationKeyClient.loadRemoteUserPublicKeys(req.params.email),
         );
       } else {
         return ApiResponseBuilder.buildApiResponse(

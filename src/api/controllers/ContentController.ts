@@ -17,30 +17,98 @@
 
 
 
-import { injectContentClient } from "@symlinkde/eco-os-pk-core";
+import { injectContentClient, injectUserClient } from "@symlinkde/eco-os-pk-core";
 import { ITokenRequest } from "../../infrastructure/protection/ITokenRequest";
 import { ApiResponseBuilder, CustomRestError } from "@symlinkde/eco-os-pk-api";
-import { PkCore, PkApi, MsContent } from "@symlinkde/eco-os-pk-models";
+import { PkCore, PkApi, MsContent, MsFederation, PkHooks, MsUser } from "@symlinkde/eco-os-pk-models";
 import { isArray } from "util";
+import { IRegisterValidator, RegisterValidator } from "../../infrastructure/register";
+import { StaticCommunityDetection, IFederationBlacklist, FederationBlacklist } from "../../infrastructure/utils";
+import { injectFederationHooks } from "@symlinkde/eco-os-pk-hooks";
 
+@injectUserClient
+@injectFederationHooks
 @injectContentClient
 export class ContentController {
-  public contentClient!: PkCore.IEcoContentClient;
+  private contentClient!: PkCore.IEcoContentClient;
+  private registrationValidator: IRegisterValidator;
+  private federationHooks!: PkHooks.IFederationHooks;
+  private userClient!: PkCore.IEcoUserClient;
+  private federationBlacklist: IFederationBlacklist;
 
+  public constructor() {
+    this.registrationValidator = new RegisterValidator();
+    this.federationBlacklist = new FederationBlacklist();
+  }
+
+  // tslint:disable-next-line:cyclomatic-complexity
   public async addContent(req: ITokenRequest): Promise<PkApi.IApiResponse> {
     try {
-      if (!isArray(req.body)) {
-        return ApiResponseBuilder.buildApiResponse(
-          await this.contentClient.createContent({
-            checksum: req.body.checksum,
-            key: req.body.key,
-            domain: req.body.domain,
-            liveTime: req.body.liveTime,
-          }),
-        );
+      if (!(await this.registrationValidator.isLocaleRegisteredDomainForContent(req.body.domain))) {
+        if (await StaticCommunityDetection.isCommunity(req)) {
+          const body: MsFederation.IFederationPostObject = req.body;
+
+          if (
+            await this.federationBlacklist.isDomainInFederationBlackist(body.domain === undefined ? "" : body.domain)
+          ) {
+            throw new CustomRestError(
+              {
+                code: 400,
+                message: "domain is not approved for federation",
+              },
+              400,
+            );
+          }
+
+          const result = await this.userClient.loadUserByEmail(req.decriptedToken.email);
+          const user: MsUser.IUser = result.data;
+
+          body.sendingDomain = user.email.split("@")[1];
+
+          return ApiResponseBuilder.buildApiResponse(
+            await this.federationHooks.postRemoteContentAsCommunity(body, {
+              // TODO: CLEAN INTERFACE
+              targetDomain: body.domain === undefined ? "" : body.domain,
+              timeStamp: new Date().getTime(),
+              to: user.email,
+            }),
+          );
+        } else {
+          const body: MsFederation.IFederationPostObject = req.body;
+
+          if (
+            await this.federationBlacklist.isDomainInFederationBlackist(body.domain === undefined ? "" : body.domain)
+          ) {
+            throw new CustomRestError(
+              {
+                code: 400,
+                message: "domain is not approved for federation",
+              },
+              400,
+            );
+          }
+
+          const result = await this.userClient.loadUserByEmail(req.decriptedToken.email);
+          const user: MsUser.IUser = result.data;
+
+          body.sendingDomain = user.email.split("@")[1];
+
+          await this.postContent(req);
+          return ApiResponseBuilder.buildApiResponse(
+            await this.federationHooks.postRemoteContent(body, {
+              // TODO: CLEAN INTERFACE
+              targetDomain: body.domain === undefined ? "" : body.domain,
+              timeStamp: new Date().getTime(),
+              to: user.email,
+            }),
+          );
+        }
       } else {
-        const content: Array<MsContent.IContent> = req.body;
-        return ApiResponseBuilder.buildApiResponse(await this.contentClient.createContent(content));
+        if (!isArray(req.body)) {
+          return await this.postContent(req);
+        } else {
+          return await this.postContentAsArray(req.body as Array<MsContent.IContent>);
+        }
       }
     } catch (err) {
       if (!err.response) {
@@ -64,7 +132,7 @@ export class ContentController {
     }
   }
 
-  public async revokeOutdatedContent(req: ITokenRequest): Promise<PkApi.IApiResponse> {
+  public async revokeOutdatedContent(): Promise<PkApi.IApiResponse> {
     try {
       return ApiResponseBuilder.buildApiResponse(await this.contentClient.revokeOutdatedContent());
     } catch (err) {
@@ -73,5 +141,21 @@ export class ContentController {
       }
       throw new CustomRestError(err.response.data.error, err.response.status);
     }
+  }
+
+  private async postContentAsArray(content: Array<MsContent.IContent>): Promise<PkApi.IApiResponse> {
+    return ApiResponseBuilder.buildApiResponse(await this.contentClient.createContent(content));
+  }
+
+  private async postContent(req: ITokenRequest): Promise<PkApi.IApiResponse> {
+    return ApiResponseBuilder.buildApiResponse(
+      await this.contentClient.createContent({
+        checksum: req.body.checksum,
+        key: req.body.key,
+        domain: req.body.domain,
+        liveTime: req.body.liveTime,
+        maxOpen: req.body.maxOpen,
+      }),
+    );
   }
 }

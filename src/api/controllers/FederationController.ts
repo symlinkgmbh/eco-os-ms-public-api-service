@@ -18,9 +18,10 @@
 
 
 import { injectFederationClient } from "@symlinkde/eco-os-pk-core";
-import { PkCore, PkApi } from "@symlinkde/eco-os-pk-models";
+import { PkCore, PkApi, MsFederation } from "@symlinkde/eco-os-pk-models";
 import { Request } from "express";
 import { ApiResponseBuilder, CustomRestError } from "@symlinkde/eco-os-pk-api";
+import { Log, LogLevel } from "@symlinkde/eco-os-pk-log";
 
 @injectFederationClient
 export class FederationController {
@@ -28,9 +29,47 @@ export class FederationController {
 
   public async procesFederationRequest(req: Request): Promise<PkApi.IApiResponse> {
     try {
+      Log.log("process federation handshake", LogLevel.info);
+      Log.log("payload", LogLevel.info);
+      Log.log(req.body, LogLevel.info);
+
+      const { encryptedEmail, encryptedDomain } = req.body;
       return ApiResponseBuilder.buildApiResponse(
-        await this.federationClient.getUserKeys(req.body.encryptedEmail, req.body.encryptedDomain),
+        await this.federationClient.getUserKeys(encryptedEmail, encryptedDomain),
       );
+    } catch (err) {
+      if (!err.response) {
+        throw new CustomRestError(err, 500);
+      }
+      throw new CustomRestError(err.response.data.error, err.response.status);
+    }
+  }
+
+  public async receiveRemoteConent(req: Request): Promise<PkApi.IApiResponse> {
+    try {
+      Log.log("receive federation content", LogLevel.info);
+      Log.log("payload", LogLevel.info);
+      Log.log(req.body, LogLevel.info);
+
+      return ApiResponseBuilder.buildApiResponse(
+        await this.federationClient.receiveRemoteContent(req.body as MsFederation.IFederationPostObject),
+      );
+    } catch (err) {
+      if (!err.response) {
+        throw new CustomRestError(err, 500);
+      }
+      throw new CustomRestError(err.response.data.error, err.response.status);
+    }
+  }
+
+  public async deliverRemoteContent(req: Request): Promise<PkApi.IApiResponse> {
+    try {
+      Log.log("deliver federation content", LogLevel.info);
+      Log.log("payload", LogLevel.info);
+      Log.log(req.body, LogLevel.info);
+
+      const { checksum, domain } = req.body;
+      return ApiResponseBuilder.buildApiResponse(await this.federationClient.deliverRemoteContent(checksum, domain));
     } catch (err) {
       if (!err.response) {
         throw new CustomRestError(err, 500);

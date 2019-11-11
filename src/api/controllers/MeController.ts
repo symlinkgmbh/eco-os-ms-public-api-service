@@ -31,30 +31,10 @@ export class MeController extends UserController {
   }
 
   public async loadMe(req: ITokenRequest): Promise<PkApi.IApiResponse> {
-    if (req.header("x-api-key")) {
-      throw new CustomRestError(
-        {
-          code: 400,
-          message: "this method is not supported by apikey",
-        },
-        400,
-      );
-    }
-
     return await this.loadUserByEmailFromToken(req);
   }
 
   public async updateMe(req: ITokenRequest): Promise<PkApi.IApiResponse> {
-    if (req.header("x-api-key")) {
-      throw new CustomRestError(
-        {
-          code: 400,
-          message: "this method is not supported by apikey",
-        },
-        400,
-      );
-    }
-
     const result = await this.loadUserByEmailFromToken(req);
     if (result.data._id === null || result.data._id === undefined) {
       throw new CustomRestError(

@@ -39,6 +39,7 @@ export class ConfigRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getAllConfig();
     this.deleteAllConfig();
     this.loadFrontendConfig();
+    this.loadSingleServiceConfig();
   }
 
   private setConfig(): void {
@@ -137,6 +138,21 @@ export class ConfigRoute extends AbstractRoutes implements PkApi.IRoute {
       .get((req: ITokenRequest, res: Response, next: NextFunction) => {
         this.configController
           .buildFrontendConfig()
+          .then((result) => {
+            res.send(result);
+          })
+          .catch((err) => {
+            next(err);
+          });
+      });
+  }
+
+  private loadSingleServiceConfig(): void {
+    this.getApp()
+      .route("/api/v1/config/service/:name")
+      .get((req: ITokenRequest, res: Response, next: NextFunction) => {
+        this.configController
+          .loadSingleServiceConf(req)
           .then((result) => {
             res.send(result);
           })

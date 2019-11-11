@@ -43,11 +43,13 @@ import {
   LicenseRoute,
   FederationRoute,
   ValidationRoute,
+  ConfigBeat,
 } from "./routes";
 
 export class Router implements PkApi.IRouter {
   protected heartbeat: Heartbeat | undefined;
   protected licenseBeat: LicenseBeat | undefined;
+  protected configBeat: ConfigBeat | undefined;
   protected accountRoute: AccountRoute | undefined;
   protected authenticationRoute: AuthenticationRoute | undefined;
   protected contentRoute: ContentRoute | undefined;
@@ -100,6 +102,7 @@ export class Router implements PkApi.IRouter {
     this.license = new LicenseRoute(this.app);
     this.federation = new FederationRoute(this.app);
     this.validation = new ValidationRoute(this.app);
+    this.configBeat = new ConfigBeat(this.app);
     return;
   }
 }

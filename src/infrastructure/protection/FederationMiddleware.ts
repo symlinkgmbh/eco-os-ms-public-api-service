@@ -22,14 +22,20 @@ import { CustomRestError } from "@symlinkde/eco-os-pk-api";
 import { serviceContainer, ECO_OS_PK_CORE_TYPES } from "@symlinkde/eco-os-pk-core";
 import { PkCore } from "@symlinkde/eco-os-pk-models";
 
+// tslint:disable-next-line:cyclomatic-complexity
 const federationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.path === "/api/v1/federation/user") {
+  if (
+    req.path === "/api/v1/federation/user" ||
+    req.path === "/api/v1/federation/content" ||
+    req.path === "/api/v1/federation/deliver"
+  ) {
     if (
       req.header("X-Federation-Checksum") === undefined ||
       req.header("X-Federation-Checksum") === null ||
       req.header("X-Federation-Checksum") === ""
     ) {
       next(
+        // add 858 error message
         new CustomRestError(
           {
             code: 403,

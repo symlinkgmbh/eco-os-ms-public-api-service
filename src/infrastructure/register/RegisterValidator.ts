@@ -33,7 +33,7 @@ export class RegisterValidator implements IRegisterValidator {
     const whiteList = await this.loadRegistrationWhitelist();
 
     const index = whiteList.findIndex((entry: string) => {
-      return entry.toLocaleLowerCase().trim() === extractDomain.toLocaleLowerCase().trim();
+      return entry.toLowerCase().trim() === extractDomain.toLowerCase().trim();
     });
 
     if (index < 0) {
@@ -47,19 +47,33 @@ export class RegisterValidator implements IRegisterValidator {
     return await StaticSecondLockResolver.hasDnsEntry(extractDomain);
   }
 
-  public async isLocaleRegisteredDomain(email: string): Promise<boolean> {
-    const extractDomain = email.split("@")[1];
+  public async isLocaleRegisteredDomain(req: Request): Promise<boolean> {
+    const extractDomain = req.params.email.split("@")[1];
     const whiteList = await this.loadRegistrationWhitelist();
 
     const index = whiteList.findIndex((entry: string) => {
-      return entry.toLocaleLowerCase().trim() === extractDomain.toLocaleLowerCase().trim();
+      return entry.toLowerCase().trim() === extractDomain.toLowerCase().trim();
+    });
+
+    if (index > -1) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public async isLocaleRegisteredDomainForContent(domain: string): Promise<boolean> {
+    const whiteList = await this.loadRegistrationWhitelist();
+
+    const index = whiteList.findIndex((entry: string) => {
+      return entry.toLowerCase().trim() === domain.toLowerCase().trim();
     });
 
     if (index < 0) {
       return false;
     }
 
-    return await StaticSecondLockResolver.hasDnsEntry(extractDomain);
+    return true;
   }
 
   public async processEula(req: Request): Promise<boolean> {

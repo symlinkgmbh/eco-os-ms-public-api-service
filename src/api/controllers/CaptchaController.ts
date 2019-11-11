@@ -35,6 +35,7 @@ export class CaptchaController {
 
   public async validateCaptcha(req: Request): Promise<void> {
     if (!(await this.captchaService.validateCaptcha(req))) {
+      // add C855 error
       throw new CustomRestError(
         {
           code: 403,

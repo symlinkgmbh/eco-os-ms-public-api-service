@@ -36,6 +36,7 @@ export class CaptchaService implements ICaptchaService {
   public async buildCaptcha(): Promise<ICaptchaResponse> {
     const result = await this.loadCaptchaConfig();
     if (!result.active) {
+      //add C856 error
       throw new CustomRestError(
         {
           code: 400,
@@ -63,6 +64,7 @@ export class CaptchaService implements ICaptchaService {
     const solution = req.header("x-captcha-result");
 
     if (token === undefined || solution === undefined) {
+      //add C857 error
       throw new CustomRestError(
         {
           code: 400,

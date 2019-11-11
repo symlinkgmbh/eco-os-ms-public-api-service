@@ -21,6 +21,7 @@ import { Request } from "express";
 
 export interface IRegisterValidator {
   isRegistrationAllowed(req: Request): Promise<boolean>;
-  isLocaleRegisteredDomain(email: string): Promise<boolean>;
+  isLocaleRegisteredDomain(req: Request): Promise<boolean>;
+  isLocaleRegisteredDomainForContent(domain: string): Promise<boolean>;
   processEula(req: Request): Promise<boolean>;
 }

@@ -44,7 +44,7 @@ export class ValidationRoute extends AbstractRoutes implements PkApi.IRoute {
         this.validationController
           .validateForgotPasswordId(req)
           .then(() => {
-            res.send(200);
+            res.sendStatus(200);
           })
           .catch((err) => {
             next(err);
@@ -59,7 +59,7 @@ export class ValidationRoute extends AbstractRoutes implements PkApi.IRoute {
         this.validationController
           .validateActivationId(req)
           .then(() => {
-            res.send(200);
+            res.sendStatus(200);
           })
           .catch((err) => {
             next(err);
@@ -74,7 +74,7 @@ export class ValidationRoute extends AbstractRoutes implements PkApi.IRoute {
         this.validationController
           .validateDeleteId(req)
           .then(() => {
-            res.send(200);
+            res.sendStatus(200);
           })
           .catch((err) => {
             next(err);

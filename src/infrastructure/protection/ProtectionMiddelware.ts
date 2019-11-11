@@ -23,12 +23,13 @@ import { ProtectionController } from "./ProtectionController";
 import { ITokenRequest } from "./ITokenRequest";
 import { Log, LogLevel } from "@symlinkde/eco-os-pk-log";
 import { serviceContainer, ECO_OS_PK_CORE_TYPES } from "@symlinkde/eco-os-pk-core";
-import { PkCore } from "@symlinkde/eco-os-pk-models";
+import { PkCore, MsUser } from "@symlinkde/eco-os-pk-models";
 
 const processRequestingPath = async (path: string): Promise<boolean> => {
   const configClient: PkCore.IEcoConfigClient = serviceContainer.get<PkCore.IEcoConfigClient>(
     ECO_OS_PK_CORE_TYPES.IEcoConfigClient,
   );
+
   const loadConf = await configClient.get("publicApiEndpoints");
   const openRoutes: Array<string> = Object(loadConf.data.publicApiEndpoints);
   if (path.split("/")[3] === "queue" || path.split("/")[3] === "docs" || path.split("/")[3] === "validation") {
@@ -81,6 +82,7 @@ const processAuthenticationByToken = async (req: ITokenRequest, res: Response, n
       return;
     })
     .catch((err) => {
+      Log.log(err, LogLevel.error);
       next(
         new CustomRestError(
           {

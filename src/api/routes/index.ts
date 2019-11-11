@@ -41,3 +41,4 @@ export * from "./LicenseBeat";
 export * from "./License";
 export * from "./Federation";
 export * from "./Validation";
+export * from "./InternalConfig";

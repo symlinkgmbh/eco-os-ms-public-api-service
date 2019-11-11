@@ -17,7 +17,10 @@
 
 
 
-export { StaticCommunityDetection } from "./StaticCommunityDetection";
-export { StaticSecondLockResolver } from "./StaticSecondLockResolver";
-export { IFederationBlacklist } from "./IFederationBlacklist";
-export { FederationBlacklist } from "./FederationBlacklist";
+import { IFederationBlacklist } from "./IFederationBlacklist";
+
+export class FederationBlacklist implements IFederationBlacklist {
+  public async isDomainInFederationBlackist(domain: string): Promise<boolean> {
+    return false;
+  }
+}

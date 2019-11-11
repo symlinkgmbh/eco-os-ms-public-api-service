@@ -31,6 +31,16 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
     encryptedDomain: "",
   };
 
+  private postFederationContentPattern: PkApi.IValidatorPattern = {
+    checksum: "",
+    domain: "",
+  };
+
+  private postFederationDeliverContent: PkApi.IValidatorPattern = {
+    checksum: "",
+    domain: "",
+  };
+
   constructor(app: Application) {
     super(app);
     this.federationController = new FederationController();
@@ -39,6 +49,8 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
 
   public activate(): void {
     this.getUsersKeysByEmail();
+    this.recieveContent();
+    this.deliverContent();
   }
 
   private getUsersKeysByEmail(): void {
@@ -50,6 +62,38 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
           .procesFederationRequest(req)
           .then((result) => {
             res.send(result.data);
+          })
+          .catch((err) => {
+            next(err);
+          });
+      });
+  }
+
+  private recieveContent(): void {
+    this.getApp()
+      .route("/api/v1/federation/content")
+      .post((req: Request, res: Response, next: NextFunction) => {
+        this.validatorService.validate(req.body, this.postFederationContentPattern);
+        this.federationController
+          .receiveRemoteConent(req)
+          .then((result) => {
+            res.send(result.data);
+          })
+          .catch((err) => {
+            next(err);
+          });
+      });
+  }
+
+  private deliverContent(): void {
+    this.getApp()
+      .route("/api/v1/federation/deliver")
+      .post((req: Request, res: Response, next: NextFunction) => {
+        this.validatorService.validate(req.body, this.postFederationDeliverContent);
+        this.federationController
+          .deliverRemoteContent(req)
+          .then((result) => {
+            res.send(result);
           })
           .catch((err) => {
             next(err);

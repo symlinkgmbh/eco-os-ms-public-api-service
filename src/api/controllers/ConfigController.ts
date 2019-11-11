@@ -105,10 +105,11 @@ export class ConfigController {
       const loadPasswordConfig = await this.configClient.get("policies");
       const passwordPolicy: MsConf.IPoliciesConfig = <MsConf.IPoliciesConfig>Object(loadPasswordConfig.data.policies);
 
+      const runningConfig = await this.configClient.getRunningConfig();
+
       const cert: ICertService = certContainer.get<ICertService>(certTypes.ICertService);
 
       const publicKeyPem = await cert.getPublicKeyPem();
-
       let publicKey = null;
 
       if (passwordPolicy.enableApiEncryption) {
@@ -125,7 +126,21 @@ export class ConfigController {
         allowAccessByApiKeys: passwordPolicy.allowAccessByApiKeys,
         shouldAcceptEula: passwordPolicy.shouldAcceptEula,
         eulaURL: passwordPolicy.eulaURL,
+        features: runningConfig.data,
       };
+    } catch (err) {
+      if (!err.response) {
+        throw new CustomRestError(err, 500);
+      }
+      throw new CustomRestError(err.response.data.error, err.response.status);
+    }
+  }
+
+  public async loadSingleServiceConf(req: ITokenRequest): Promise<PkApi.IApiResponse> {
+    try {
+      return ApiResponseBuilder.buildApiResponse(
+        await this.configClient.getRunningConfigFromSingleService(req.params.name),
+      );
     } catch (err) {
       if (!err.response) {
         throw new CustomRestError(err, 500);
