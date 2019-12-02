@@ -48,7 +48,14 @@ export class RegisterRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/register")
       .post((req: ITokenRequest, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.registerPattern);
+        this.validatorService.validate(req.body, this.registerPattern, [
+          {
+            field: "email",
+            minLength: 4,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.captchaService
           .validateCaptcha(req)
           .then(() => {

@@ -21,10 +21,7 @@ import { Request } from "express";
 
 export class StaticCommunityDetection {
   public static async isCommunity(req: Request): Promise<boolean> {
-    if (
-      req.hostname.trim().toLowerCase() === "community.2ndlock.org" ||
-      req.host.trim().toLowerCase() === "community.2ndlock.org"
-    ) {
+    if (req.hostname.trim().toLowerCase() === "community.2ndlock.org") {
       return true;
     }
 

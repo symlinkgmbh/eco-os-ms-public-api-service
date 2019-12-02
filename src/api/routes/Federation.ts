@@ -57,7 +57,20 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/federation/user")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postFederationUserRequestService);
+        this.validatorService.validate(req.body, this.postFederationUserRequestService, [
+          {
+            field: "encryptedEmail",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "encryptedDomain",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.federationController
           .procesFederationRequest(req)
           .then((result) => {
@@ -73,7 +86,20 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/federation/content")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postFederationContentPattern);
+        this.validatorService.validate(req.body, this.postFederationContentPattern, [
+          {
+            field: "checksum",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "domain",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.federationController
           .receiveRemoteConent(req)
           .then((result) => {
@@ -89,7 +115,20 @@ export class FederationRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/federation/deliver")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postFederationDeliverContent);
+        this.validatorService.validate(req.body, this.postFederationDeliverContent, [
+          {
+            field: "checksum",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "domain",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.federationController
           .deliverRemoteContent(req)
           .then((result) => {

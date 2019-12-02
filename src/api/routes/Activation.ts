@@ -48,7 +48,26 @@ export class ActivationRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/activation/activate")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.activationPattern);
+        this.validatorService.validate(req.body, this.activationPattern, [
+          {
+            field: "activationId",
+            minLength: 10,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "password",
+            minLength: 8,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "confirmPassword",
+            minLength: 8,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.activationController
           .activateUser(req)
           .then((result) => {

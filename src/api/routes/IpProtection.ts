@@ -54,7 +54,14 @@ export class IpProtectionRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/protection")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postIpPattern);
+        this.validatorService.validate(req.body, this.postIpPattern, [
+          {
+            field: "address",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.ipProtectionController
           .add(req)
           .then((result) => {

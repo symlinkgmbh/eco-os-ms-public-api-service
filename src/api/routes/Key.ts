@@ -110,7 +110,26 @@ export class KeyRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/key")
       .post((req: ITokenRequest, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postKeyPattern);
+        this.validatorService.validate(req.body, this.postKeyPattern, [
+          {
+            field: "pubKey",
+            minLength: 20,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "deviceId",
+            minLength: 10,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "email",
+            minLength: 4,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.keyController
           .addKeyToUserByEmail(req)
           .then((result) => {

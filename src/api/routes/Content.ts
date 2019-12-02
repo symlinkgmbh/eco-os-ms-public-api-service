@@ -50,11 +50,37 @@ export class ContentRoute extends AbstractRoutes implements PkApi.IRoute {
       .route("/api/v1/content")
       .post((req: ITokenRequest, res: Response, next: NextFunction) => {
         if (!isArray(req.body)) {
-          this.validatorService.validate(req.body, this.postContentPattern);
+          this.validatorService.validate(req.body, this.postContentPattern, [
+            {
+              field: "checksum",
+              minLength: 10,
+              typeCheck: true,
+              targetType: PkApi.IValidatorTypes.string,
+            },
+            {
+              field: "key",
+              minLength: 10,
+              typeCheck: true,
+              targetType: PkApi.IValidatorTypes.string,
+            },
+          ]);
         } else {
           const contentArr = req.body;
           contentArr.map((entry) => {
-            this.validatorService.validate(entry, this.postContentPattern);
+            this.validatorService.validate(entry, this.postContentPattern, [
+              {
+                field: "checksum",
+                minLength: 10,
+                typeCheck: true,
+                targetType: PkApi.IValidatorTypes.string,
+              },
+              {
+                field: "key",
+                minLength: 10,
+                typeCheck: true,
+                targetType: PkApi.IValidatorTypes.string,
+              },
+            ]);
           });
         }
         this.contentController

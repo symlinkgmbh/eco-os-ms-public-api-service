@@ -48,7 +48,14 @@ export class LicenseRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/licensing")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postLicensePattern);
+        this.validatorService.validate(req.body, this.postLicensePattern, [
+          {
+            field: "license",
+            minLength: 15,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.licenseController
           .addLicense(req)
           .then((result) => {

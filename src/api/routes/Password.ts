@@ -54,7 +54,14 @@ export class PasswordRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/password/forgot")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postForgotPasswordPattern);
+        this.validatorService.validate(req.body, this.postForgotPasswordPattern, [
+          {
+            field: "email",
+            minLength: 4,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.userController
           .sendForgotPasswordRequest(req.body as MsUser.IForgotPasswordRequest)
           .then((result) => {
@@ -85,7 +92,33 @@ export class PasswordRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/password/update")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postUpdatePasswordPattern);
+        this.validatorService.validate(req.body, this.postUpdatePasswordPattern, [
+          {
+            field: "otp",
+            onlyNumber: true,
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "forgotPasswordId",
+            minLength: 10,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "password",
+            minLength: 6,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "confirmPassword",
+            minLength: 6,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.userController
           .sendAndUpdatePassword(req.body as MsUser.IForgotPasswordUpdateRequest)
           .then((result) => {

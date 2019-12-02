@@ -44,7 +44,14 @@ export class DeleteRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/delete/me")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postDeleteAccountPattern);
+        this.validatorService.validate(req.body, this.postDeleteAccountPattern, [
+          {
+            field: "deleteId",
+            minLength: 8,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.userController
           .deleteUserByDeleteId(req)
           .then((result) => {

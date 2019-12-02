@@ -94,7 +94,14 @@ export class AccountRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/account")
       .post((req: ITokenRequest, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postAccountPattern);
+        this.validatorService.validate(req.body, this.postAccountPattern, [
+          {
+            field: "email",
+            minLength: 4,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         this.userController
           .createUser(req)
           .then((result) => {
@@ -186,7 +193,13 @@ export class AccountRoute extends AbstractRoutes implements PkApi.IRoute {
     this.getApp()
       .route("/api/v1/account/access/apikey")
       .post((req: ITokenRequest, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postApikeyPattern);
+        this.validatorService.validate(req.body, this.postApikeyPattern, [
+          {
+            field: "apiKey",
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.object,
+          },
+        ]);
         this.userController
           .addApiKey(req)
           .then((result) => {

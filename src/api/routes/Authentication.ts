@@ -43,7 +43,20 @@ export class AuthenticationRoute extends AbstractRoutes implements PkApi.IRoute 
     this.getApp()
       .route("/api/v1/authenticate")
       .post((req: Request, res: Response, next: NextFunction) => {
-        this.validatorService.validate(req.body, this.postAuthPattern);
+        this.validatorService.validate(req.body, this.postAuthPattern, [
+          {
+            field: "email",
+            minLength: 4,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+          {
+            field: "password",
+            minLength: 5,
+            typeCheck: true,
+            targetType: PkApi.IValidatorTypes.string,
+          },
+        ]);
         const authController = new AuthenticatioController(req.body as MsAuth.IAuthenticationRequest);
         authController
           .authenticate()
